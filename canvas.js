@@ -51,8 +51,8 @@ class Circle {
     colors = ['#2f2f2f', '#333', '#272727'];
     pauseAnimation = false;
     isColiding = false;
-    xd = 3;
-    yd = 3;
+    xd = Tool.random(1 , 3);
+    yd = Tool.random(1, 3);
     moveByMouse;
     prevColor;
 
@@ -91,11 +91,17 @@ class Circle {
         this.x += this.xd;
         this.y += this.yd;
 
+		//wall collision
+
         if (
             this.x + this.radius >= window.innerWidth ||
             this.x - this.radius <= 0
         ) {
             this.xd = this.xd * -1;
+			this.xd *= 1.2
+
+			this.checkVelocity()
+			
         }
 
         if (
@@ -103,11 +109,22 @@ class Circle {
             this.y - this.radius <= 0
         ) {
             this.yd *= -1;
+			this.xd *= 1.2
+
+			this.checkVelocity()
+			
         }
 
         this.detectClosest();
         this.draw();
     }
+
+	checkVelocity(){
+		console.log({
+			x: this.xd,
+			y: this.yd
+		})
+	}
 
     detectClosest() {
         for (let i = 0; i < Circle.allCircles.length; i++) {
@@ -117,12 +134,9 @@ class Circle {
                     this.getCirclesDistance(this.x, this.y, elx.x, elx.y) <
                     this.radius + elx.radius
                 ) {
-                    // this.color = this.colors[Tool.random(0, 2)];
-					this.prevColor = this.color
-                    this.color = 'green';
-                }else{
-					this.color = this.prevColor
-				}
+                    this.xd *= -1
+					this.yd *= -1
+                }
             }
         }
     }
