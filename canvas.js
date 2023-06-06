@@ -6,33 +6,20 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 window.addEventListener('resize', function () {
-    canvas.width = window.innerWidth / 2;
-    // canvas.height = window.innerHeight
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 });
 
-let stop = false;
-// ctx.fillStyle = '#ccc'
-// ctx.fillRect(10, 20, 150, 150)
+ctx.fillStyle = '#212121';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-//canvas backround
+let stop = false;
+let isDrowing = false;
 
 const mouse = {
     x: null,
     y: null
 };
-
-canvas.addEventListener('click', (e) => {
-    mouse.x = e.pageX;
-    mouse.y = e.pageY;
-
-    const circle = new Circle(mouse.x, mouse.y, Tool.random(10, 25));
-    Circle.addCirlce(circle);
-
-    circle.draw();
-    circle.detectClosest();
-
-    // Store every build circle
-});
 
 ctx.fillStyle = '#ccc';
 ctx.strokeStyle = 'red';
@@ -48,11 +35,12 @@ class Box {}
 
 class Circle {
     static allCircles = [];
+
+	stopBall = false
     colors = ['#2f2f2f', '#333', '#272727'];
-    pauseAnimation = false;
     isColiding = false;
-    xd = Tool.random(1 , 3);
-    yd = Tool.random(1, 3);
+    xd = Tool.random(1, 1.5);
+    yd = Tool.random(1, 1.5);
     moveByMouse;
     prevColor;
 
@@ -61,7 +49,7 @@ class Circle {
         this.y = y;
         this.radius = radius;
         this.color = this.colors[Tool.random(0, this.colors.length - 1)];
-		this.prevColor = this.color
+        this.prevColor = this.color;
 
         this.xd *= this.randDirection();
         this.yd *= this.randDirection();
@@ -88,57 +76,91 @@ class Circle {
     }
 
     update() {
-        this.x += this.xd;
-        this.y += this.yd;
+        if (!this.stop || !this.stopBall) {
+            this.x += this.xd;
+            this.y += this.yd;
 
-		//wall collision
+            //wall collision
 
-        if (
-            this.x + this.radius >= window.innerWidth ||
-            this.x - this.radius <= 0
-        ) {
-            this.xd = this.xd * -1;
-			this.xd *= 1.2
+            if (
+                this.x + this.radius >= window.innerWidth ||
+                this.x - this.radius <= 0
+            ) {
+                this.xd = this.xd * -1;
 
-			this.checkVelocity()
-			
-        }
+                this.checkVelocity();
+                this.accelerate('horisontal');
+            }
 
-        if (
-            this.y + this.radius >= window.innerHeight ||
-            this.y - this.radius <= 0
-        ) {
-            this.yd *= -1;
-			this.xd *= 1.2
+            if (
+                this.y + this.radius >= window.innerHeight ||
+                this.y - this.radius <= 0
+            ) {
+                this.yd *= -1;
 
-			this.checkVelocity()
-			
+                this.checkVelocity();
+                this.accelerate('vertical');
+            }
         }
 
         this.detectClosest();
+        this.brushCollision();
         this.draw();
     }
 
-	checkVelocity(){
-		console.log({
-			x: this.xd,
-			y: this.yd
-		})
-	}
+    accelerate(collisionPosition) {
+        if (collisionPosition == 'horisontal') {
+            if (Math.abs(this.yd) <= 3) {
+                this.yd *= 1.2;
+            }
+        }
+
+        if (collisionPosition == 'vertical') {
+            if (Math.abs(this.xd) <= 3) {
+                this.xd *= 1.2;
+            }
+        }
+    }
+
+    checkVelocity() {
+        // console.log({
+        // 	x: this.xd,
+        // 	y: this.yd
+        // })
+    }
 
     detectClosest() {
         for (let i = 0; i < Circle.allCircles.length; i++) {
+            //check if circles collide between them
             const elx = Circle.allCircles[i];
             if (elx !== this) {
                 if (
                     this.getCirclesDistance(this.x, this.y, elx.x, elx.y) <
                     this.radius + elx.radius
                 ) {
-                    this.xd *= -1
-					this.yd *= -1
+					this.stop  = true
+                    this.xd *= -1;
+                    this.yd *= -1;
                 }
             }
         }
+    }
+
+    brushCollision() {
+
+    //    console.log(
+	// 	Brush.paths
+	//    )
+		const brushPoints = Brush.paths.flat(1)
+
+		brushPoints.forEach(point=>{
+			if(
+				this.getCirclesDistance(this.x, this.y, point.x, point.y) < this.radius + 2
+			){
+				this.xd *= -1;
+				this.yd *= -1;
+			}
+		})
     }
 
     getCirclesDistance = (xpos1, ypos1, xpos2, ypos2) => {
@@ -153,29 +175,6 @@ class Circle {
     }
 
     static checkCollisions() {
-        // for (let i = 0; i < Circle.allCircles.length; i++) {
-        //     const elx = Circle.allCircles[i];
-        //     for (let j = 0; j < Circle.allCircles.length; j++) {
-        //         const ely = Circle.allCircles[j];
-
-        //         if (elx !== ely) {
-        //             const curr = arr.at(-1);
-        //             const sensorDistance = 10;
-        //             if (
-        //                 elx.x - elx.radius - (ely.x + ely.radius) <
-        //                     sensorDistance &&
-        //                 ely.x - elx.x - elx.radius - ely.radius <
-        //                     sensorDistance &&
-        //                 elx.y - elx.radius - (ely.y + elx.radius) <
-        //                     sensorDistance &&
-        //                 ely.y - elx.y - elx.radius - ely.radius < sensorDistance
-        //             ) {
-        //                 ely.color = 'red';
-        //             }
-        //         }
-        //     }
-        // }
-
         for (let i = 0; i < Circle.allCircles.length; i++) {
             const elx = Circle.allCircles[i];
             if (elx !== this) {
@@ -209,19 +208,104 @@ class Circle {
     }
 }
 
-const getDistance = (xpos1, ypos1, xpos2, ypos2) => {
-    const result = Math.sqrt(
-        Math.pow(xpos2 - xpos1, 2) + Math.pow(ypos2 - ypos1, 2)
+class Brush {
+    static paths = [];
+
+    color = '#2f2f2f';
+    lineWith = 3;
+    coords = [];
+    isDrowing = false;
+
+    constructor() {
+        canvas.addEventListener('mousemove', this.storeCoords.bind(this));
+        canvas.addEventListener('mousedown', this.mouseDown.bind(this));
+        canvas.addEventListener('mouseup', this.mouseUp.bind(this));
+    }
+
+    mouseDown() {
+        this.isDrowing = true;
+        this.coords.push([]);
+    }
+
+    mouseUp() {
+        this.isDrowing = false;
+    }
+
+    drawLine(x, y) {
+        // set line stroke and line width
+        ctx.strokeStyle = '#2f2f2f';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    storeCoords(e) {
+        if (!this.isDrowing) return;
+
+        this.coords.at(-1).push({
+            x: e.clientX,
+            y: e.clientY
+        });
+
+        Brush.paths = this.coords;
+    }
+
+    update() {
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.lineWith;
+        ctx.lineCap = 'round';
+
+        this.coords.forEach((paths) => {
+            paths.forEach((path, index) => {
+                if (index == 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(path.x, path.y);
+                } else {
+                    ctx.lineTo(path.x, path.y);
+                }
+            });
+            ctx.stroke();
+        });
+    }
+
+    getCoords() {
+        this.coords.forEach((paths) => {
+            paths.forEach((path, index) => {
+                if (index == 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(path.x, path.y);
+                } else {
+                    ctx.lineTo(path.x, path.y);
+                }
+            });
+            ctx.stroke();
+        });
+    }
+}
+
+for (let i = 0; i < 1; i++) {
+    const circle = new Circle(
+        Tool.random(100, window.innerWidth - 100),
+        Tool.random(100, window.innerHeight - 100),
+        Tool.random(10, 25)
     );
-    return result;
-};
+    Circle.addCirlce(circle);
+}
+
+const brush = new Brush();
 
 function animate() {
-    if (stop) return;
+    // if (stop) return;
 
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     ctx.fillStyle = '#212121';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    brush.update();
 
     Circle.allCircles.forEach((circle) => {
         circle.update();
