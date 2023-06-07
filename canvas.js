@@ -21,22 +21,16 @@ const mouse = {
     y: null
 };
 
-ctx.fillStyle = '#ccc';
-ctx.strokeStyle = 'red';
-ctx.lineWidth = 5;
-
 class Tool {
     static random(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 }
 
-class Box {}
-
 class Circle {
     static allCircles = [];
 
-	stopBall = false
+    stopBall = false;
     colors = ['#2f2f2f', '#333', '#272727'];
     isColiding = false;
     xd = Tool.random(1, 1.5);
@@ -89,7 +83,7 @@ class Circle {
                 this.xd = this.xd * -1;
 
                 this.checkVelocity();
-                this.accelerate('horisontal');
+                // this.accelerate('horisontal');
             }
 
             if (
@@ -99,7 +93,7 @@ class Circle {
                 this.yd *= -1;
 
                 this.checkVelocity();
-                this.accelerate('vertical');
+                // this.accelerate('vertical');
             }
         }
 
@@ -138,7 +132,7 @@ class Circle {
                     this.getCirclesDistance(this.x, this.y, elx.x, elx.y) <
                     this.radius + elx.radius
                 ) {
-					this.stop  = true
+                    this.stop = true;
                     this.xd *= -1;
                     this.yd *= -1;
                 }
@@ -147,20 +141,26 @@ class Circle {
     }
 
     brushCollision() {
+        const brushPoints = Brush.paths.flat(1);
 
-    //    console.log(
-	// 	Brush.paths
-	//    )
-		const brushPoints = Brush.paths.flat(1)
-
-		brushPoints.forEach(point=>{
-			if(
-				this.getCirclesDistance(this.x, this.y, point.x, point.y) < this.radius + 2
-			){
-				this.xd *= -1;
-				this.yd *= -1;
-			}
-		})
+        brushPoints.forEach((point) => {
+            const circleCenterPointDiff = this.getCirclesDistance(
+                this.x,
+                this.y,
+                point.x,
+                point.y
+            );
+            if (circleCenterPointDiff < this.radius + 2) {
+                // if true == stuck
+                if (circleCenterPointDiff < this.radiusr) {
+                    this.x += this.radius * (this.xd > 0 ? 1 : -1);
+                    this.d += this.radius * (this.xd > 0 ? 1 : -1);
+                } else {
+                    this.xd *= -1;
+                    this.yd *= -1;
+                }
+            }
+        });
     }
 
     getCirclesDistance = (xpos1, ypos1, xpos2, ypos2) => {
@@ -208,11 +208,13 @@ class Circle {
     }
 }
 
+// Brush class for drowing on canvas
+
 class Brush {
     static paths = [];
 
     color = '#2f2f2f';
-    lineWith = 3;
+    lineWith = 1;
     coords = [];
     isDrowing = false;
 
@@ -291,7 +293,8 @@ for (let i = 0; i < 1; i++) {
     const circle = new Circle(
         Tool.random(100, window.innerWidth - 100),
         Tool.random(100, window.innerHeight - 100),
-        Tool.random(10, 25)
+        // Tool.random(10, 25)
+        20
     );
     Circle.addCirlce(circle);
 }
