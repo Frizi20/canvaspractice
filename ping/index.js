@@ -25,14 +25,15 @@ class Pallete {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.speed = 20;
+        this.speed = 25;
+        this.floatHeight = 35
 
         if (!x) {
             this.x = canvas.width / 2 - this.width / 2;
         }
 
         if (!y) {
-            this.y = canvas.height - 25;
+            this.y = canvas.height - this.floatHeight;
         }
 
         this.initialState = {
@@ -40,6 +41,14 @@ class Pallete {
         };
 
         document.addEventListener('keydown', this.move.bind(this));
+        document.addEventListener('keyup', (e)=>{
+            if (e.key === 'ArrowLeft' && this.x > 10) {
+                this.xd = 0;
+            }
+            if (e.key === 'ArrowRight' && this.x + this.width < canvas.width - 10) {
+                this.xd = 0;
+            }
+        } )
     }
 
     draw() {
@@ -68,23 +77,23 @@ class Pallete {
 }
 
 class Ball {
-    speed = 3;
+    speed = 1;
 
     constructor(pallete) {
         this.color = '#292929';
         this.radius = 10;
         this.x = pallete.x + pallete.width / 2;
         this.y = pallete.y - pallete.height - 10;
-		// this.angleRad = Tool.random(0.2,0.8)
-		this.angleRad = 1.1
+        // this.angleRad = Tool.random(0.2,0.8)
+        this.angleRad = 1;
         // this.xd = this.speed;
         // this.yd = this.speed;
 
-		this.xd = this.speed * Math.cos((Math.PI / 2) * this.angleRad )
-		this.yd = this.speed * Math.sin((Math.PI / 2) * this.angleRad )
+        this.xd = this.speed * Math.cos(Math.PI / 4);
+        this.yd = this.speed * Math.sin(Math.PI / 4);
         //store initial values
 
-		console.log(this.angleRad)
+        console.log(this.angleRad);
 
         this.initialState = {
             x: this.x,
@@ -128,23 +137,18 @@ class Ball {
             this.y + this.radius >= pallete.y &&
             this.x > pallete.x &&
             this.x < pallete.x + pallete.width
-        ) {	
-
-			this.yd = -this.yd;
-			if(this.x < pallete.x + pallete.width / 2){
-				this.xd = this.speed * Math.cos((Math.PI / 2) * 1.3)
-				this.yd = this.speed * Math.sin((Math.PI / 2) * 1.3)
-			}
-			else if(this.x === pallete.x + pallete.width / 2){
-				this.xd = 0
-				this.xd = -this.xd
-				
-			}
-			else{
-				this.xd = this.speed * Math.cos((Math.PI / 2) * 0.7)
-				this.yd = this.speed * Math.sin((Math.PI / 2) * 0.7)
-				
-			}
+        ) {
+            this.yd = -this.yd;
+            if (this.x < pallete.x + pallete.width / 2) {
+                this.xd = this.speed * Math.cos((Math.PI / 2) * 1.3);
+                this.yd = this.speed * Math.sin((Math.PI / 2) * 1.3);
+            } else if (this.x === pallete.x + pallete.width / 2) {
+                this.xd = 0;
+                this.xd = -this.xd;
+            } else {
+                this.xd = this.speed * Math.cos((Math.PI / 2) * 0.7);
+                this.yd = this.speed * Math.sin((Math.PI / 2) * 0.7);
+            }
         }
     }
 
@@ -167,11 +171,11 @@ class Brick {
     static allBricks = [];
     margin = 10;
     marginTop = 30;
-    bricksPerRow = 6;
+    bricksPerRow = 8;
     brickHeight = 20;
     brickGap = 2;
 
-	isBroken = false
+    isBroken = false;
 
     constructor(ball) {
         this.color = '#292929';
@@ -188,16 +192,15 @@ class Brick {
             this.ball.x + this.ball.radius > this.x &&
             this.ball.x - this.ball.radius < this.x + this.width
         ) {
-			this.ball.yd = this.ball.yd * -1
-			// this.ball.xd = 3
-			//redirect ball
-			// this.ball.yd = Math.abs(this.ball.yd)
-			//remove brick instance from the allBricks [array]
+            this.ball.yd = this.ball.yd * -1;
+            // this.ball.xd = 3
+            //redirect ball
+            // this.ball.yd = Math.abs(this.ball.yd)
+            //remove brick instance from the allBricks [array]
             this.break();
-
-        }else{
-			// console.log('not iet')
-		}
+        } else {
+            // console.log('not iet')
+        }
     }
 
     placeBrick() {
@@ -208,7 +211,7 @@ class Brick {
             this.y = this.marginTop;
         } else {
             //if previous it was the last on his row
-            if (bricks.length % 6 === 0) {
+            if (bricks.length % this.bricksPerRow === 0) {
                 this.x = this.margin + this.brickGap / 2;
                 this.y = bricks.at(-1).y + this.brickHeight + this.brickGap;
             } else {
@@ -229,8 +232,7 @@ class Brick {
     }
 
     break() {
-
-		this.isBroken = true
+        this.isBroken = true;
         // const bricks = Brick.allBricks;
         // const currBrickIndex = bricks.indexOf(this);
         // bricks.splice(currBrickIndex, 1);
@@ -244,8 +246,8 @@ class Brick {
     }
 
     update() {
-		if(this.isBroken) return
-		this.checkBallCollision()
+        if (this.isBroken) return;
+        this.checkBallCollision();
         this.draw();
     }
 }
@@ -254,7 +256,7 @@ const pallete = new Pallete(100, 10);
 const ball = new Ball(pallete);
 // const brick = new Brick();
 
-const bricks = new Array(6 * 4).fill(0).map(() => new Brick(ball));
+const bricks = new Array(8 * 8).fill(0).map(() => new Brick(ball));
 
 function animate() {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
