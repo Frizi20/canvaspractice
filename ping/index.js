@@ -15,7 +15,7 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 class Tool {
     static random(min, max) {
-        return (Math.random() * (max - min + 1) + min);
+        return parseFloat((Math.random() * (max - min + 1) + min).toFixed(4));
     }
 }
 
@@ -75,13 +75,16 @@ class Ball {
         this.radius = 10;
         this.x = pallete.x + pallete.width / 2;
         this.y = pallete.y - pallete.height - 10;
-		this.angleRad = Tool.random(0.2,0.8)
+		// this.angleRad = Tool.random(0.2,0.8)
+		this.angleRad = 1.1
         // this.xd = this.speed;
         // this.yd = this.speed;
 
 		this.xd = this.speed * Math.cos((Math.PI / 2) * this.angleRad )
 		this.yd = this.speed * Math.sin((Math.PI / 2) * this.angleRad )
         //store initial values
+
+		console.log(this.angleRad)
 
         this.initialState = {
             x: this.x,
@@ -125,8 +128,23 @@ class Ball {
             this.y + this.radius >= pallete.y &&
             this.x > pallete.x &&
             this.x < pallete.x + pallete.width
-        ) {
-            this.yd = -this.yd;
+        ) {	
+
+			this.yd = -this.yd;
+			if(this.x < pallete.x + pallete.width / 2){
+				this.xd = this.speed * Math.cos((Math.PI / 2) * 1.3)
+				this.yd = this.speed * Math.sin((Math.PI / 2) * 1.3)
+			}
+			else if(this.x === pallete.x + pallete.width / 2){
+				this.xd = 0
+				this.xd = -this.xd
+				
+			}
+			else{
+				this.xd = this.speed * Math.cos((Math.PI / 2) * 0.7)
+				this.yd = this.speed * Math.sin((Math.PI / 2) * 0.7)
+				
+			}
         }
     }
 
@@ -170,12 +188,13 @@ class Brick {
             this.ball.x + this.ball.radius > this.x &&
             this.ball.x - this.ball.radius < this.x + this.width
         ) {
-
+			this.ball.yd = this.ball.yd * -1
+			// this.ball.xd = 3
+			//redirect ball
+			// this.ball.yd = Math.abs(this.ball.yd)
 			//remove brick instance from the allBricks [array]
             this.break();
 
-			//redirect ball
-			this.ball.yd = -this.ball.yd
         }else{
 			// console.log('not iet')
 		}
