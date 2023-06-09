@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Calculator</title>
+</head>
+<body>
+
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: sans-serif;
+		}
+
+		body{
+			background-color: #212121;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 100vh;
+		}
+
+		.calculator-container{
+			width: 300px;
+			height: 400px;
+			border: 1px solid #292929;
+			padding: 10px;
+		}
+		
+		.calculator{
+			height: 100%;
+			border: 1px solid #292929;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.screen{
+			height: 100px;
+			border: 1px solid grey;
+			padding: 10px;
+		}
+
+		.display{
+			border: 1px solid #292929;
+			height: 100%;
+			color: grey;
+			position: relative;
+		}
+
+		.display .expression{
+			position: absolute;
+			right: 5px;
+			bottom: 5px;
+		}
+
+		.buttons-container{
+			border: 1px solid grey;
+			flex: 1;
+			display: flex;
+		}
+
+		.numbers{
+			display: flex;
+			flex: 0 0 80%;
+			flex-wrap: wrap;
+		}
+
+		.operators{
+			flex: 1;
+			/* height: 100%; */
+			/* background:red; */
+			display: flex;
+			flex-direction: column;
+
+		}
+
+		.operators .btn{
+			flex: 0 0 calc(100% / 4);
+			color: grey;
+			border: 1px solid #292929;
+			/* align-items: center; */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.operators .btn:last-child{
+			/* background-color: red; */
+			/* flex: 0 0 calc(100% / 4); */
+			/* height: 200px; */
+			
+		}
+
+		.numbers .btn{
+			flex: 0 0 calc(100% / 3);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: grey;
+			border: 1px solid #292929;
+			cursor: pointer;
+		}
+
+		.btn.active:hover{
+			background: #a3a3a30c;
+		}
+		
+		.btn.active:active{
+			background: #5c5c5cf3;
+
+		}
+	</style>
+	
+	<div class="calculator-container">
+		<div class="calculator">
+			<div class="screen">
+				<div class="display">
+					<div class="expression">
+						
+					</div>
+				</div>
+			</div>
+			<div class="buttons-container">
+				<div class="numbers">
+					<div class="btn active">7</div>
+					<div class="btn active">8</div>
+					<div class="btn active">9</div>
+					<div class="btn active">4</div>
+					<div class="btn active">5</div>
+					<div class="btn active">6</div>
+					<div class="btn active">1</div>
+					<div class="btn active">2</div>
+					<div class="btn active">3</div>
+					<div class="btn active">Del</div>
+					<div class="btn active">0</div>
+					<div class="btn active">=</div>
+
+				</div>
+				<div class="operators">
+					<!-- <div class="btn active">c</div> -->
+					<div class="btn active">/</div>
+					<div class="btn active">*</div>
+					<div class="btn active">-</div>
+					<div class="btn active">+</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+		const nrButtons = document.querySelectorAll('.btn.active')
+		const expression = document.querySelector('.expression')
+
+
+		const operators = ['+','*','-','/','=']
+
+		let values = []
+		let typingValue = ''
+		let currOperator = ''
+
+		nrButtons.forEach(btn=>{
+			btn.addEventListener('click',(e)=>{
+				const value = e.target.textContent
+
+				// if(value === 'Del'){
+				// 	expression.textContent = ''
+					
+				// }else{
+				// 	expression.textContent += value
+				// }
+
+				// if(parseInt(value)){
+				// 	typingValue += value
+				// }else if(operators.includes(value)){
+				// 	values.push(typingValue)
+				// 	typingValue = ''
+				// }
+
+			
+
+				// if(value )
+
+				if(!operators.includes(value)){
+					typingValue  += value
+					currOperator += 2
+				}else{
+					values.push(typingValue)
+
+					typingValue = ''
+				}
+
+
+				if(value !== 'Del' && value !== '=' ){
+					expression.textContent += value
+				}else{
+					if(value === 'Del') {
+						expression.textContent = ''
+						currOperator = ''
+						typingValue = ''
+						values.length = 0
+					}
+				}
+			
+			})
+		})
+
+
+
+	</script>
+</body>
+</html>
