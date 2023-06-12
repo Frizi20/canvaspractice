@@ -100,15 +100,15 @@ class Pallete {
 }
 
 class Ball {
-    speed = 5;
+    speed = 2;
 
     constructor(pallete) {
         this.color = '#292929';
         this.radius = 10;
         this.x = pallete.x + pallete.width / 2;
 
-        this.y = pallete.y - pallete.height - 10;
         this.y = 10;
+        this.y = pallete.y - pallete.height - 10;
         
         this.angleRad = 1;
         // this.xd = this.speed;
@@ -172,7 +172,7 @@ class Ball {
             //if ball hits the first 1/4 of the pallete
             if (this.x < pallete.x + pallete.width / 4) {
                 console.log('left');
-                this.xd = this.speed * Math.cos(Tool.degInRad(45));
+                this.xd = this.speed * Math.co`s(Tool.degInRad(45));
                 this.yd = this.speed * Math.sin(Tool.degInRad(45));
             }
 			
@@ -328,7 +328,7 @@ const pallete = new Pallete(100, 10);
 const ball = new Ball(pallete);
 // const brick = new Brick();
 
-const bricks = new Array(8 * 8).fill(0).map(() => new Brick(ball));
+const bricks = new Array(8 * 6).fill(0).map(() => new Brick(ball));
 
 function animate() {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
