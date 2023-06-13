@@ -113,7 +113,7 @@ class Pallete {
 }
 
 class Ball {
-    speed = 2;
+    speed = 0.5;
     gameOver = false;
     gameIsWon = false;
 
@@ -150,6 +150,18 @@ class Ball {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
+    }
+
+    showBallSpeed() {
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#a3a3a3';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+            'ball speed: ' + this.speed.toFixed(2),
+            canvas.width / 2,
+            20,
+            200
+        );
     }
 
     update() {
@@ -191,7 +203,7 @@ class Ball {
         }
 
         this.palleteCollision();
-
+        this.showBallSpeed();
         this.draw();
     }
 
@@ -343,11 +355,14 @@ class Brick {
     }
 
     hit() {
+        // this.ball.speed += 0.1;
+
         if (this.hits > 1) {
             this.hits--;
             this.color = this.colors[this.hits - 1];
             return;
         }
+
         this.break();
     }
 
@@ -389,19 +404,16 @@ const ball = new Ball(pallete);
 
 let bricks = [];
 
-for (let i = 0; i < 8 * 3; i++) {
+for (let i = 0; i < 8 * 5; i++) {
     let brickHits = 1;
-    if (i % 2 == 0) {
-        brickHits = 1;
-    }
 
-    if (i % 3 == 0) {
-        brickHits = 2;
-    }
+    // if (i % 3 == 0) {
+    //     brickHits = 2;
+    // }
 
-    if (i % 5 == 0) {
-        brickHits = 3;
-    }
+    // if (i % 5 == 0) {
+    //     brickHits = 3;
+    // }
 
     const brick = new Brick(ball, brickHits);
 
