@@ -1,13 +1,26 @@
 /** @type {HTMLCanvasElement} */
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
+const canvasRect = canvas.getBoundingClientRect();
+const mouse = {
+    x: undefined,
+    y: undefined
+};
+
+let moveWithMouse = false;
 
 canvas.width = 600;
 canvas.height = canvas.width / (16 / 9);
 
-window.addEventListener('resize', function () {
-    // canvas.width = window.innerWidth;
-    // canvas.height = window.innerHeight;
+window.addEventListener('mousemove', (e) => {
+    // mouse.x =  canvasRect.left - e.clientX ;
+    // mouse.y =   e.clientY ;
+    // console.log('--------')
+    // console.log(e.clientY);
+    // console.log(canvasRect.y)
+
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
 });
 
 ctx.fillStyle = '#212121';
@@ -15,14 +28,14 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 class Tool {
     static random(min, max) {
-        return parseFloat((Math.random() * (max - min + 1) + min).toFixed(4));
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     static degInRad(deg) {
         const oneRadDeg = 360 / (Math.PI * 2);
         const oneDegInRad = 1 / oneRadDeg;
 
-        return oneDegInRad * (deg + 90);
+        return oneDegInRad * deg;
     }
 }
 
@@ -101,6 +114,8 @@ class Pallete {
 
 class Ball {
     speed = 2;
+    gameOver = false;
+    gameIsWon = false;
 
     constructor(pallete) {
         this.color = '#292929';
@@ -109,16 +124,14 @@ class Ball {
 
         this.y = 10;
         this.y = pallete.y - pallete.height - 10;
-        
+
         this.angleRad = 1;
         // this.xd = this.speed;
         // this.yd = this.speed;
 
-        this.xd = this.speed * Math.cos(Tool.degInRad(-15));
-        this.yd = this.speed * Math.sin(Tool.degInRad(-15));
+        this.xd = this.speed * Math.cos(Tool.degInRad(120));
+        this.yd = this.speed * Math.sin(Tool.degInRad(120));
         //store initial values
-
-    
 
         // console.log(this.angleRad);
 
@@ -140,22 +153,66 @@ class Ball {
     }
 
     update() {
-        this.x += this.xd;
-        this.y -= this.yd;
-
-        //Side walls collision
-        if (this.x + this.radius >= canvas.width || this.x - this.radius <= 0) {
-            this.xd = -this.xd;
+        if (this.gameOver) {
+            this.endGame();
+            return;
         }
 
-        //Top wall collision
-        if (this.y - this.radius < 0) {
-            this.yd = -this.yd;
+        if (this.gameIsWon) {
+            this.winGame();
+            return;
+        }
+
+        if (!moveWithMouse) {
+            this.x += this.xd;
+            this.y -= this.yd;
+
+            //Side walls collision
+            if (
+                this.x + this.radius >= canvas.width ||
+                this.x - this.radius <= 0
+            ) {
+                this.xd = -this.xd;
+            }
+
+            //Top wall collision
+            if (this.y - this.radius < 0) {
+                this.yd = -this.yd;
+            }
+
+            //Check if ball falls
+
+            if (this.y - this.radius > canvas.height) {
+                this.gameOver = true;
+            }
+        } else {
+            this.x = mouse.x;
+            this.y = mouse.y;
         }
 
         this.palleteCollision();
 
         this.draw();
+    }
+
+    winGame() {
+        this.yd = 0;
+        this.xd = 0;
+
+        ctx.font = '60px Veranda';
+        ctx.fillStyle = '#313131';
+        ctx.textAlign = 'center';
+        ctx.fillText('You win!!!', canvas.width / 2, canvas.height / 2);
+    }
+
+    endGame() {
+        this.yd = 0;
+        this.xd = 0;
+
+        ctx.font = '60px Veranda';
+        ctx.fillStyle = '#313131';
+        ctx.textAlign = 'center';
+        ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
     }
 
     palleteCollision() {
@@ -166,39 +223,15 @@ class Ball {
             this.x > pallete.x &&
             this.x < pallete.x + pallete.width
         ) {
-            //move ball down
+            const deg =
+                ((this.pallete.width + this.pallete.x - this.x) /
+                    this.pallete.width) *
+                360;
+
+            this.xd = this.speed * Math.cos(Tool.degInRad(deg));
+            this.xd = this.speed * Math.sin(Tool.degInRad(deg));
+
             this.yd = -this.yd;
-
-            //if ball hits the first 1/4 of the pallete
-            if (this.x < pallete.x + pallete.width / 4) {
-                console.log('left');
-                this.xd = this.speed * Math.co`s(Tool.degInRad(45));
-                this.yd = this.speed * Math.sin(Tool.degInRad(45));
-            }
-			
-			//if ball hits the last 1/4 of the pallete
-            if (this.x > pallete.x + pallete.width / 2) {
-                console.log('right');
-                this.xd = this.speed * Math.cos(Tool.degInRad(-45));
-                this.yd = this.speed * Math.sin(Tool.degInRad(-45));
-            }
-
-			if (this.x > pallete.x + pallete.width / 4 && this.x < pallete.x + pallete.width /2) {
-				this.xd = this.speed * Math.cos(Tool.degInRad(30));
-                this.yd = this.speed * Math.sin(Tool.degInRad(30));
-			}
-
-			if (this.x > pallete.x + pallete.width / 2 && this.x < pallete.x + pallete.width * .75) {
-				this.xd = this.speed * Math.cos(Tool.degInRad(-30));
-                this.yd = this.speed * Math.sin(Tool.degInRad(-30));
-			}
-
-			//if ball hits the center
-            if (this.x > pallete.x + (pallete.width / 2) - 5 && this.x <= pallete.x + (pallete.width / 2) + 5 ) {
-				console.log('center')
-                this.xd = 0;
-                this.xd = -this.xd;
-            }
         }
     }
 
@@ -224,25 +257,26 @@ class Brick {
     bricksPerRow = 8;
     brickHeight = 20;
     brickGap = 2;
-
+    // colors = ['#3a3a3a','#292929','#242424']
+    colors = ['#272727', '#313131', '#383838'];
+    gameLost = false;
     isBroken = false;
 
-    constructor(ball) {
-        this.color = '#292929';
+    constructor(ball, hits) {
         this.height = this.brickHeight;
         this.ball = ball;
+        this.hits = hits;
+        this.color = this.colors[hits - 1];
 
         this.placeBrick();
     }
 
-	checkBottomCol(){
-		
-		const brickCenter = {
-			x: this.x + this.width/2,
-			y: this.y + this.height/2
-		} 
-
-	}
+    checkBottomCol() {
+        const brickCenter = {
+            x: this.x + this.width / 2,
+            y: this.y + this.height / 2
+        };
+    }
 
     checkBallCollision() {
         if (
@@ -251,25 +285,30 @@ class Brick {
             this.ball.x + this.ball.radius > this.x &&
             this.ball.x - this.ball.radius < this.x + this.width
         ) {
-            
-			
-			// if((this.ball.y - this.ball.radius) - (this.y + this.height) - 10 < 0){
-			// 	this.ball.yd = -Math.abs(this.ball.yd);
-			// 	console.log('hit from the top')
+            //Check brick side collision
 
-			// }
+            if (this.ball.x < this.x) {
+                // console.log('left')
+                this.ball.xd = -Math.abs(this.ball.xd);
+            }
 
-			// if(this.y - (this.ball.y + this.ball.radius) < 0){
-			// 	this.ball.yd = Math.abs(this.ball.yd);
-			// 	console.log('hit from the bottom')
-			// }
+            if (this.ball.x > this.x + this.width) {
+                // console.log('right')
+                this.ball.xd = Math.abs(this.ball.xd);
+            }
 
-			// this.ball.xd = -this.ball.xd 
-			this.ball.yd = -this.ball.yd 
+            if (this.ball.y < this.y) {
+                // console.log('top')
+                this.ball.yd = Math.abs(this.ball.yd);
+            }
 
+            if (this.ball.y > this.y + this.height) {
+                // console.log('bottom')
 
-            // remove brick instance from the allBricks [array]
-            this.break();
+                this.ball.yd = -Math.abs(this.ball.yd);
+            }
+
+            this.hit();
         } else {
             // console.log('not iet')
         }
@@ -303,24 +342,42 @@ class Brick {
             this.brickGap;
     }
 
+    hit() {
+        if (this.hits > 1) {
+            this.hits--;
+            this.color = this.colors[this.hits - 1];
+            return;
+        }
+        this.break();
+    }
+
     break() {
         this.isBroken = true;
-        // const bricks = Brick.allBricks;
-        // const currBrickIndex = bricks.indexOf(this);
-        // bricks.splice(currBrickIndex, 1);
     }
 
     draw() {
-        ctx.beginPath();
-        ctx.fillStyle = this.color;
-        ctx.rect(this.x, this.y, this.width, this.height);
-        ctx.fill();
+        if (!this.gameLost) {
+            ctx.beginPath();
+            ctx.fillStyle = this.color;
+            ctx.rect(this.x, this.y, this.width, this.height);
+            ctx.fill();
+        }
     }
 
     update() {
+        if (this.gameIsWon()) {
+            this.ball.gameIsWon = true;
+            return;
+        }
+
         if (this.isBroken) return;
+
         this.checkBallCollision();
         this.draw();
+    }
+
+    gameIsWon() {
+        return Brick.allBricks.filter((brick) => !brick.isBroken).length === 0;
     }
 }
 
@@ -328,7 +385,28 @@ const pallete = new Pallete(100, 10);
 const ball = new Ball(pallete);
 // const brick = new Brick();
 
-const bricks = new Array(8 * 6).fill(0).map(() => new Brick(ball));
+// const bricks = new Array(8 * 6).fill(0).map(() => new Brick(ball, 3));
+
+let bricks = [];
+
+for (let i = 0; i < 8 * 3; i++) {
+    let brickHits = 1;
+    if (i % 2 == 0) {
+        brickHits = 1;
+    }
+
+    if (i % 3 == 0) {
+        brickHits = 2;
+    }
+
+    if (i % 5 == 0) {
+        brickHits = 3;
+    }
+
+    const brick = new Brick(ball, brickHits);
+
+    bricks.push(brick);
+}
 
 function animate() {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -340,7 +418,7 @@ function animate() {
 
     Brick.allBricks.forEach((brick) => brick.update());
 
-	// Brick.allBricks.at(-4).checkBottomCol()
+    // Brick.allBricks.at(-4).checkBottomCol()
 
     requestAnimationFrame(animate);
 }

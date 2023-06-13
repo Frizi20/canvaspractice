@@ -27,7 +27,7 @@
 		.calculator-container{
 			width: 300px;
 			height: 400px;
-			border: 1px solid #292929;
+			border: 1px solid grey;
 			padding: 10px;
 		}
 		
@@ -40,14 +40,14 @@
 
 		.screen{
 			height: 100px;
-			border: 1px solid grey;
+			border: 1px solid #292929;
 			padding: 10px;
 		}
 
 		.display{
-			border: 1px solid #292929;
+			border: 1px solid grey;
 			height: 100%;
-			color: grey;
+			color: #292929;
 			position: relative;
 		}
 
@@ -55,10 +55,11 @@
 			position: absolute;
 			right: 5px;
 			bottom: 5px;
+			color: grey;
 		}
 
 		.buttons-container{
-			border: 1px solid grey;
+			border: 1px solid #292929;
 			flex: 1;
 			display: flex;
 		}
@@ -157,9 +158,9 @@
 		const expression = document.querySelector('.expression')
 
 
-		const operators = ['+','*','-','/','=']
+		const operators = ['+','*','-','/']
 
-		let values = []
+		let firstValue = ''
 		let typingValue = ''
 		let currOperator = ''
 
@@ -167,48 +168,64 @@
 			btn.addEventListener('click',(e)=>{
 				const value = e.target.textContent
 
-				// if(value === 'Del'){
-				// 	expression.textContent = ''
-					
-				// }else{
-				// 	expression.textContent += value
-				// }
 
-				// if(parseInt(value)){
-				// 	typingValue += value
-				// }else if(operators.includes(value)){
-				// 	values.push(typingValue)
-				// 	typingValue = ''
-				// }
-
-			
-
-				// if(value )
-
-				if(!operators.includes(value)){
-					typingValue  += value
-					currOperator += 2
-				}else{
-					values.push(typingValue)
-
+				//Clear all values 
+				if(value === 'Del') {
+					firstValue = undefined
 					typingValue = ''
+					currOperator =''
+					expression.textContent = ''
 				}
 
-
-				if(value !== 'Del' && value !== '=' ){
+				//show numbers on display or operators
+				if(!Number.isNaN(parseInt(value))){
 					expression.textContent += value
-				}else{
-					if(value === 'Del') {
-						expression.textContent = ''
-						currOperator = ''
-						typingValue = ''
-						values.length = 0
-					}
+					typingValue+=value
+
+				}
+
+				//store the written value 
+				if(operators.includes(value)){
+					expression.textContent += value
+					firstValue = typingValue
+					typingValue = ''
+					currOperator = value
+				}
+
+				//show results
+				if(value === '=' && !Number.isNaN(parseInt(firstValue))){
+					const result = calcultate(Number(firstValue),Number(typingValue), currOperator)
+					//display result
+
+					expression.textContent = result
+					//clear all variables
+					typingValue = result
+					currOperator = ''
+					firstValue = ''
+
 				}
 			
 			})
 		})
 
+		function calcultate(nr1,nr2,operator){
+			let result = undefined;
+
+			if(operator === '+'){
+				result = nr1 + nr2		
+			}
+			if(operator === '-'){
+				result = nr1 - nr2		
+			}
+			if(operator === '*'){
+				result = nr1 * nr2		
+			}
+			if(operator === '/'){
+				result = nr1 / nr2		
+			}
+
+			return result
+		}
 
 
 	</script>

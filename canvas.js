@@ -162,6 +162,7 @@ class Circle {
             }
         });
     }
+	//this.getCirclesDistance(this.x, this.y, elx.x, elx.y) <
 
     getCirclesDistance = (xpos1, ypos1, xpos2, ypos2) => {
         const result = Math.sqrt(
