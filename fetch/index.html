@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Fetch</title>
+    </head>
+    <body>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: sans-serif;
+            }
+
+            body {
+                background-color: #313131;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
+
+            .users-container {
+                width: 1200px;
+                /* height: 500px; */
+                border: 1px solid #444444;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+
+            .user-card-container {
+                flex: 0 0 calc(100% / 4);
+                padding: 10px;
+                border: 1px soldi gainsboro;
+            }
+
+            .user-card {
+                border: 1px solid grey;
+            }
+
+            .avatar {
+                height: 150px;
+                background-color: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .img-container {
+                width: 100px;
+                height: 100px;
+                position: relative;
+                border-radius: 50%;
+                overflow: hidden;
+            }
+
+            .img-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+            .user-details > div {
+                text-align: center;
+				padding: 5px 0;
+            }
+
+            .user-details {
+                background-color: #eee;
+                margin-top: 2px;
+            }
+
+            .username {
+                font-size: 22px;
+                color: #232323;
+                /* background: red; */
+				padding: 5px;
+            }
+
+        </style>
+
+		
+
+        <div class="users-container"></div>
+
+        <script src="index.js"></script>
+    </body>
+</html>

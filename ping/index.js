@@ -13,12 +13,6 @@ canvas.width = 600;
 canvas.height = canvas.width / (16 / 9);
 
 window.addEventListener('mousemove', (e) => {
-    // mouse.x =  canvasRect.left - e.clientX ;
-    // mouse.y =   e.clientY ;
-    // console.log('--------')
-    // console.log(e.clientY);
-    // console.log(canvasRect.y)
-
     mouse.x = e.clientX;
     mouse.y = e.clientY;
 });
@@ -113,7 +107,7 @@ class Pallete {
 }
 
 class Ball {
-    speed = 0.5;
+    speed = 1.5;
     gameOver = false;
     gameIsWon = false;
 
